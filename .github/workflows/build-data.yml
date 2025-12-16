@@ -16,6 +16,8 @@ jobs:
       
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -31,7 +33,15 @@ jobs:
       - name: Prepare Publish
         run: |
           mkdir dist
-          mv resources.parquet dist/
+          cp resources.parquet dist/
+
+      - name: Commit and Push Parquet File
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add resources.parquet
+          git diff --staged --quiet || git commit -m "Update resources.parquet [skip ci]"
+          git push
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
